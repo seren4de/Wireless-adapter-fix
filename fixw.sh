@@ -17,3 +17,8 @@ if ! crontab -l | grep -q "@reboot $(pwd)/fixw.sh"; then
 else
   echo "[-] fixw.sh is already in the crontab file"
 fi
+
+# Restart networking
+sudo service NetworkManager restart
+echo "[+] Networking restarted"
+exit 0
