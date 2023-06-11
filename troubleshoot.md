@@ -1,11 +1,24 @@
-$ ifconfig wlan0         
-wlan0: error fetching interface information: Device not found
+# Wireless Adapter Fix
 
-#Check if the wireless adapter is being detected by the system
+## Checking the wireless adapter
+
+First, check if the wireless adapter is being detected by the system:
+
+```sh
+$ ifconfig wlan0
+wlan0: error fetching interface information: Device not found
+```
+
+```sh
 $ lspci | grep -i network 
 00:14.3 Network controller: Intel Corporation Comet Lake PCH CNVi WiFi
+```
 
-#Check if the correct driver is installed
+## Checking the driver
+
+Check if the correct driver is installed:
+
+```sh
 $ sudo lshw -C network
   *-network UNCLAIMED       
        description: Network controller
@@ -37,30 +50,54 @@ $ sudo lshw -C network
   *-network
        description: Ethernet interface
        physical id: d
-       bus info: usb@1:5
-       logical name: usb0
-       serial: 7e:7f:d3:37:b2:36
-       capabilities: ethernet physical
-       configuration: autonegotiation=off broadcast=yes driver=rndis_host driverversion=6.1.0-kali7-amd64 duplex=half firmware=RNDIS device ip=192.168.170.239 link=yes multicast=yes port=twisted pair
+       bus info:<IPAddress>
+       logical name:<IPAddress>
+       serial:<IPAddress>
+       capabilities:<IPAddress>
+       configuration:<IPAddress>
+```
 
-#dentify the exact model of your Intel wireless adapter 
-$ lspci -vnn | grep -i network
-00:14.3 Network controller [0280]: Intel Corporation Comet Lake PCH CNVi WiFi [8086:06f0]
+According to the output of `lshw -C network`, it appears that the Intel wireless adapter is detected by the system but is listed as `*-network UNCLAIMED`. This usually means that the driver for the device is not installed or loaded.
 
+## Identifying the model
 
-#According to the output of lshw -C network, it appears that Intel wireless adapter is detected by the system but is listed as “*-network UNCLAIMED”. This usually means that the driver for the device is not installed or loaded.
+Identify the exact model of your Intel wireless adapter:
 
-$ sudo apt update
+```sh
+$ lspci -vnn | grep -i network 
+00:<IPAddress> Network controller [0280]: Intel Corporation Comet Lake PCH CNVi WiFi [8086:<IPAddress>]
+```
 
-#Install the firmware for your Intel wireless adapter 
-$ sudo apt install firmware-iwlwifi
+## Installing the firmware
 
-#Load the driver 
-$ sudo modprobe iwlwifi
+Update your package list:
 
-#fix
+```sh 
+$ sudo apt update 
+```
 
-$ sudo crontab -e
-<
-@reboot /$HOME/wififix/fixw.sh
+Install the firmware for your Intel wireless adapter:
 
+```sh 
+$ sudo apt install firmware-iwlwifi 
+```
+
+Load the driver:
+
+```sh 
+$ sudo modprobe iwlwifi 
+```
+
+## Fixing the issue
+
+To fix this issue permanently, you can add a script to run at startup using `crontab`:
+
+```sh 
+$ sudo crontab -e 
+```
+
+Add this line to the end of the file:
+
+```
+@reboot /$HOME/wififix/fixw.sh 
+```
